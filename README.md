@@ -1,7 +1,7 @@
 # PassGuard 🔐
 
 <p align="center">
-  <img src="docs/images/passguard-logo.png" alt="PassGuard Logo" width="200"/>
+  <img src="static/img/logo.svg" alt="PassGuard Logo" width="200"/>
   <br>
   <em>Seguridad simplificada para un mundo digital</em>
 </p>
@@ -89,7 +89,7 @@ print(f"Contraseña generada: {password}")
 ## 🗺️ Roadmap
 
 <p align="center">
-  <img src="docs/images/passguard-roadmap.png" alt="PassGuard Roadmap" width="600"/>
+  <img src="static/img/logo.svg" alt="PassGuard Roadmap" width="600"/>
 </p>
 
 - [x] Algoritmos de generación segura
