@@ -6,22 +6,27 @@ document.addEventListener('DOMContentLoaded', function() {
     const refreshPasswordBtn = document.getElementById('refresh-password');
     const generatePasswordBtn = document.getElementById('generate-password');
     const passwordLengthInput = document.getElementById('password-length');
-    const decreaseLengthBtn = document.getElementById('decrease-length');
-    const increaseLengthBtn = document.getElementById('increase-length');
+    const lengthSlider = document.getElementById('length-slider');
     const uppercaseCheckbox = document.getElementById('uppercase');
     const lowercaseCheckbox = document.getElementById('lowercase');
     const numbersCheckbox = document.getElementById('numbers');
     const specialCheckbox = document.getElementById('special');
-    const strengthBars = document.querySelectorAll('.strength-meter .bar');
-    const strengthText = document.querySelector('.strength-text');
-    const passwordAnalysis = document.querySelector('.password-analysis');
-    const crackTimeElement = document.getElementById('crack-time');
-    const securityScoreElement = document.getElementById('security-score');
-    const securityWarnings = document.getElementById('security-warnings');
+    const standardRadio = document.getElementById('standard');
+    const easyToReadRadio = document.getElementById('easy-to-read');
+    const easyToPronounceRadio = document.getElementById('easy-to-pronounce');
+    const strengthMeter = document.querySelector('.meter-bar');
+    const strengthText = document.getElementById('strength-text');
+    const themeSwitch = document.getElementById('theme-switch');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
 
     // Configuración inicial
     let passwordLength = 12;
     passwordLengthInput.value = passwordLength;
+    lengthSlider.value = passwordLength;
+
+    // Establecer tema según preferencia del usuario
+    initTheme();
 
     // Generar una contraseña al cargar la página
     generatePassword();
@@ -33,21 +38,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Evento para copiar la contraseña al portapapeles
     copyPasswordBtn.addEventListener('click', copyToClipboard);
 
-    // Eventos para aumentar/disminuir la longitud de la contraseña
-    decreaseLengthBtn.addEventListener('click', function() {
-        if (passwordLength > 4) {
-            passwordLength--;
-            passwordLengthInput.value = passwordLength;
-            generatePassword();
-        }
-    });
-
-    increaseLengthBtn.addEventListener('click', function() {
-        if (passwordLength < 50) {
-            passwordLength++;
-            passwordLengthInput.value = passwordLength;
-            generatePassword();
-        }
+    // Evento para cambiar la longitud con el slider
+    lengthSlider.addEventListener('input', function() {
+        passwordLength = parseInt(this.value);
+        passwordLengthInput.value = passwordLength;
+        generatePassword();
     });
 
     // Evento para cambiar la longitud manualmente
@@ -55,15 +50,23 @@ document.addEventListener('DOMContentLoaded', function() {
         const value = parseInt(this.value);
         if (value >= 4 && value <= 50) {
             passwordLength = value;
+            lengthSlider.value = value;
         } else if (value < 4) {
             passwordLength = 4;
             this.value = 4;
+            lengthSlider.value = 4;
         } else if (value > 50) {
             passwordLength = 50;
             this.value = 50;
+            lengthSlider.value = 50;
         }
         generatePassword();
     });
+
+    // Eventos para las opciones de tipo de contraseña
+    standardRadio.addEventListener('change', generatePassword);
+    easyToReadRadio.addEventListener('change', generatePassword);
+    easyToPronounceRadio.addEventListener('change', generatePassword);
 
     // Eventos para los checkboxes
     const checkboxes = [uppercaseCheckbox, lowercaseCheckbox, numbersCheckbox, specialCheckbox];
@@ -75,20 +78,32 @@ document.addEventListener('DOMContentLoaded', function() {
                 !numbersCheckbox.checked && 
                 !specialCheckbox.checked) {
                 this.checked = true;
-                showNotification('Debe seleccionar al menos un tipo de carácter');
+                showToast('Debe seleccionar al menos un tipo de carácter');
             }
             generatePassword();
         });
     });
+
+    // Evento para cambiar tema
+    themeSwitch.addEventListener('click', toggleTheme);
 
     // Función principal para generar una contraseña mediante la API de Python
     async function generatePassword() {
         // Mostrar indicador de carga
         passwordResult.value = "Generando...";
         
+        // Preparar el tipo de contraseña
+        let passwordType = 'standard';
+        if (easyToReadRadio.checked) {
+            passwordType = 'easy-to-read';
+        } else if (easyToPronounceRadio.checked) {
+            passwordType = 'easy-to-pronounce';
+        }
+        
         // Preparar los datos para la solicitud
         const requestData = {
             length: passwordLength,
+            type: passwordType,
             uppercase: uppercaseCheckbox.checked,
             lowercase: lowercaseCheckbox.checked,
             numbers: numbersCheckbox.checked,
@@ -117,61 +132,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Actualizar el medidor de seguridad
             updateStrengthMeter(data.strength.score, data.strength.level);
             
-            // Solicitar análisis detallado (podríamos expandir esto en el futuro)
-            requestPasswordAnalysis(data.password);
-            
         } catch (error) {
             console.error('Error:', error);
             passwordResult.value = "Error al generar";
-            showNotification('Error al generar la contraseña. Inténtelo de nuevo.');
-        }
-    }
-    
-    // Función para solicitar un análisis detallado de la contraseña
-    async function requestPasswordAnalysis(password) {
-        try {
-            // Esta ruta aún no existe en el backend, pero podríamos implementarla
-            // en el futuro para obtener análisis más detallados
-            const response = await fetch('/api/check-password', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ password: password })
-            });
-            
-            if (!response.ok) {
-                throw new Error('Error al analizar la contraseña');
-            }
-            
-            const data = await response.json();
-            
-            // Mostrar el análisis detallado
-            // Esto es un placeholder para una futura implementación
-            passwordAnalysis.style.display = 'block';
-            securityScoreElement.textContent = `${data.strength.score}/100`;
-            
-            // Placeholder para el tiempo de descifrado (implementación futura)
-            const scoreToTime = {
-                25: "segundos",
-                50: "horas",
-                75: "meses",
-                90: "años",
-                100: "siglos"
-            };
-            
-            let timeEstimate = "segundos";
-            for (const [score, time] of Object.entries(scoreToTime)) {
-                if (data.strength.score >= parseInt(score)) {
-                    timeEstimate = time;
-                }
-            }
-            
-            crackTimeElement.textContent = timeEstimate;
-            
-        } catch (error) {
-            console.error('Error en análisis:', error);
-            // No mostrar errores de análisis al usuario, ya que es una característica secundaria
+            showToast('Error al generar la contraseña. Inténtelo de nuevo.');
         }
     }
 
@@ -190,74 +154,69 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 300);
         
         // Mostrar notificación
-        showNotification('Contraseña copiada al portapapeles');
+        showToast('Contraseña copiada al portapapeles');
     }
 
-    // Función para mostrar una notificación
-    function showNotification(message) {
-        // Eliminar notificación existente si hay alguna
-        const existingNotification = document.querySelector('.copy-notification');
-        if (existingNotification) {
-            existingNotification.remove();
-        }
+    // Función para mostrar notificaciones toast
+    function showToast(message) {
+        toastMessage.textContent = message;
+        toast.classList.add('show');
         
-        // Crear nueva notificación
-        const notification = document.createElement('div');
-        notification.className = 'copy-notification';
-        notification.textContent = message;
-        document.body.appendChild(notification);
-        
-        // Mostrar la notificación
+        // Ocultar el toast después de 3 segundos
         setTimeout(() => {
-            notification.classList.add('show');
-        }, 10);
-        
-        // Ocultar la notificación después de 2 segundos
-        setTimeout(() => {
-            notification.classList.remove('show');
-            setTimeout(() => {
-                notification.remove();
-            }, 300);
-        }, 2000);
+            toast.classList.remove('show');
+        }, 3000);
     }
 
     // Función para actualizar el medidor de seguridad
     function updateStrengthMeter(score, level) {
-        // Resetear las barras
-        strengthBars.forEach(bar => {
-            bar.className = 'bar';
-        });
+        // Actualizar la barra de progreso
+        const percentage = score + '%';
+        strengthMeter.style.width = percentage;
         
-        // Actualizar barras según la puntuación
-        if (score >= 25) {
-            strengthBars[0].classList.add('weak');
-        }
-        if (score >= 50) {
-            strengthBars[0].classList.add('medium');
-            strengthBars[1].classList.add('medium');
-        }
-        if (score >= 75) {
-            strengthBars[0].classList.add('strong');
-            strengthBars[1].classList.add('strong');
-            strengthBars[2].classList.add('strong');
-        }
-        if (score >= 90) {
-            strengthBars[0].classList.add('strong');
-            strengthBars[1].classList.add('strong');
-            strengthBars[2].classList.add('strong');
-            strengthBars[3].classList.add('strong');
-        }
-        
-        // Actualizar el texto de seguridad
+        // Actualizar el texto
         strengthText.textContent = level;
         
         // Cambiar el color según el nivel
-        if (level === "Muy débil" || level === "Débil") {
-            strengthText.style.color = '#dc3545';
-        } else if (level === "Media") {
-            strengthText.style.color = '#ffc107';
+        if (score < 40) {
+            strengthMeter.style.width = '25%';
+            strengthText.style.color = 'var(--danger-color)';
+        } else if (score < 70) {
+            strengthMeter.style.width = '50%';
+            strengthText.style.color = 'var(--warning-color)';
+        } else if (score < 90) {
+            strengthMeter.style.width = '75%';
+            strengthText.style.color = 'var(--primary-color)';
         } else {
-            strengthText.style.color = '#28a745';
+            strengthMeter.style.width = '100%';
+            strengthText.style.color = 'var(--success-color)';
+        }
+    }
+
+    // Función para inicializar el tema
+    function initTheme() {
+        const prefersDarkScheme = window.matchMedia('(prefers-color-scheme: dark)');
+        const currentTheme = localStorage.getItem('theme');
+        
+        if (currentTheme === 'dark' || (!currentTheme && prefersDarkScheme.matches)) {
+            document.body.setAttribute('data-theme', 'dark');
+            themeSwitch.innerHTML = '<i class="fas fa-sun"></i>';
+        } else {
+            document.body.removeAttribute('data-theme');
+            themeSwitch.innerHTML = '<i class="fas fa-moon"></i>';
+        }
+    }
+
+    // Función para cambiar el tema
+    function toggleTheme() {
+        if (document.body.getAttribute('data-theme') === 'dark') {
+            document.body.removeAttribute('data-theme');
+            localStorage.setItem('theme', 'light');
+            themeSwitch.innerHTML = '<i class="fas fa-moon"></i>';
+        } else {
+            document.body.setAttribute('data-theme', 'dark');
+            localStorage.setItem('theme', 'dark');
+            themeSwitch.innerHTML = '<i class="fas fa-sun"></i>';
         }
     }
 });

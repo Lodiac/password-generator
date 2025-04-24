@@ -3,178 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SecurePass | Generador de Contraseñas</title>
+    <title>PassGuard - Generador de Contraseñas Seguras</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
-    <!-- Fuentes modernas -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Iconos -->
+    <!-- Fuente moderna y legible -->
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome para iconos -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="theme-toggle">
-        <button id="theme-switch">
-            <i class="fas fa-moon"></i>
-        </button>
-    </div>
-
-    <div class="app-container">
+    <div class="container">
         <header>
-            <div class="brand">
-                <div class="logo-container">
-                    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="SecurePass Logo" class="logo">
-                </div>
-                <h1>SecurePass</h1>
+            <div class="logo">
+                <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="PassGuard Logo">
+                <h1>PassGuard</h1>
             </div>
-            <p class="tagline">Generador de contraseñas avanzado con Python</p>
+            <div class="theme-toggle">
+                <button id="theme-switch" aria-label="Cambiar tema">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
         </header>
 
         <main>
-            <div class="card password-generator">
-                <div class="password-result-container">
+            <div class="card generator-card">
+                <h2>Crea tu contraseña</h2>
+                
+                <!-- Display de la contraseña generada -->
+                <div class="password-field">
                     <input type="text" id="password-result" readonly>
                     <div class="password-actions">
-                        <button id="copy-password" class="icon-button" aria-label="Copiar contraseña">
+                        <button id="copy-password" class="action-btn" title="Copiar al portapapeles">
                             <i class="fas fa-copy"></i>
                         </button>
-                        <button id="refresh-password" class="icon-button" aria-label="Generar nueva contraseña">
+                        <button id="refresh-password" class="action-btn" title="Generar nueva">
                             <i class="fas fa-sync-alt"></i>
                         </button>
                     </div>
                 </div>
-
-                <div class="strength-indicator">
+                
+                <!-- Medidor de seguridad -->
+                <div class="strength-container">
                     <div class="strength-meter">
-                        <div class="bar-container">
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                            <div class="bar"></div>
-                        </div>
-                        <span class="strength-text">Fuerte</span>
+                        <div class="meter-bar"></div>
                     </div>
+                    <div class="strength-label">Seguridad: <span id="strength-text">Media</span></div>
                 </div>
-
+                
+                <!-- Configuración de la contraseña -->
                 <div class="options-container">
-                    <div class="length-option">
-                        <label for="password-length">
-                            <i class="fas fa-text-width"></i>
-                            <span>Longitud</span>
-                        </label>
+                    <!-- Longitud de la contraseña -->
+                    <div class="option-group">
+                        <label for="password-length">Longitud</label>
                         <div class="length-control">
-                            <button id="decrease-length" class="control-btn"><i class="fas fa-minus"></i></button>
                             <input type="number" id="password-length" min="4" max="50" value="12">
-                            <button id="increase-length" class="control-btn"><i class="fas fa-plus"></i></button>
+                            <input type="range" id="length-slider" min="4" max="50" value="12">
                         </div>
                     </div>
-
-                    <div class="character-options">
-                        <div class="option-item">
-                            <label for="uppercase" class="checkbox-container">
+                    
+                    <!-- Tipo de contraseña -->
+                    <div class="option-group character-type">
+                        <h3>Tipo de contraseña</h3>
+                        <div class="radio-group">
+                            <div class="radio-option">
+                                <input type="radio" id="standard" name="password-type" checked>
+                                <label for="standard">Estándar</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="easy-to-read" name="password-type">
+                                <label for="easy-to-read">Fácil de leer</label>
+                            </div>
+                            <div class="radio-option">
+                                <input type="radio" id="easy-to-pronounce" name="password-type">
+                                <label for="easy-to-pronounce">Pronunciable</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Caracteres a incluir -->
+                    <div class="option-group">
+                        <h3>Incluir caracteres</h3>
+                        <div class="checkbox-grid">
+                            <div class="checkbox-option">
                                 <input type="checkbox" id="uppercase" checked>
-                                <span class="checkmark"></span>
-                                <div class="option-text">
-                                    <i class="fas fa-font"></i>
-                                    <span>Mayúsculas</span>
-                                </div>
-                            </label>
-                        </div>
-                        <div class="option-item">
-                            <label for="lowercase" class="checkbox-container">
+                                <label for="uppercase">Mayúsculas (A-Z)</label>
+                            </div>
+                            <div class="checkbox-option">
                                 <input type="checkbox" id="lowercase" checked>
-                                <span class="checkmark"></span>
-                                <div class="option-text">
-                                    <i class="fas fa-font fa-xs"></i>
-                                    <span>Minúsculas</span>
-                                </div>
-                            </label>
-                        </div>
-                        <div class="option-item">
-                            <label for="numbers" class="checkbox-container">
+                                <label for="lowercase">Minúsculas (a-z)</label>
+                            </div>
+                            <div class="checkbox-option">
                                 <input type="checkbox" id="numbers" checked>
-                                <span class="checkmark"></span>
-                                <div class="option-text">
-                                    <i class="fas fa-hashtag"></i>
-                                    <span>Números</span>
-                                </div>
-                            </label>
-                        </div>
-                        <div class="option-item">
-                            <label for="special" class="checkbox-container">
+                                <label for="numbers">Números (0-9)</label>
+                            </div>
+                            <div class="checkbox-option">
                                 <input type="checkbox" id="special" checked>
-                                <span class="checkmark"></span>
-                                <div class="option-text">
-                                    <i class="fas fa-at"></i>
-                                    <span>Símbolos</span>
-                                </div>
-                            </label>
+                                <label for="special">Símbolos (@#$%)</label>
+                            </div>
                         </div>
                     </div>
                 </div>
-
+                
                 <button id="generate-password" class="primary-button">
-                    <i class="fas fa-key"></i>
-                    <span>Generar Contraseña</span>
+                    Generar Contraseña
                 </button>
             </div>
-
-            <div class="security-info-section">
-                <div class="card tips-card">
-                    <h2><i class="fas fa-shield-alt"></i> Consejos de Seguridad</h2>
-                    <ul class="security-tips">
-                        <li>
-                            <span class="tip-icon"><i class="fas fa-check-circle"></i></span>
-                            <span class="tip-text">Usa mínimo 12 caracteres</span>
-                        </li>
-                        <li>
-                            <span class="tip-icon"><i class="fas fa-check-circle"></i></span>
-                            <span class="tip-text">Combina varios tipos de caracteres</span>
-                        </li>
-                        <li>
-                            <span class="tip-icon"><i class="fas fa-check-circle"></i></span>
-                            <span class="tip-text">Evita palabras del diccionario</span>
-                        </li>
-                        <li>
-                            <span class="tip-icon"><i class="fas fa-check-circle"></i></span>
-                            <span class="tip-text">Usa contraseñas únicas para cada servicio</span>
-                        </li>
+            
+            <div class="card info-card">
+                <h2>¿Por qué usar contraseñas seguras?</h2>
+                <p>Las contraseñas fuertes son tu primera línea de defensa contra el acceso no autorizado a tus cuentas digitales.</p>
+                
+                <div class="tips-section">
+                    <h3>Consejos de seguridad</h3>
+                    <ul class="tips-list">
+                        <li><i class="fas fa-check"></i> Usa contraseñas únicas para cada cuenta</li>
+                        <li><i class="fas fa-check"></i> Combina letras, números y símbolos</li>
+                        <li><i class="fas fa-check"></i> Evita información personal o palabras comunes</li>
+                        <li><i class="fas fa-check"></i> Cambia tus contraseñas regularmente</li>
                     </ul>
                 </div>
                 
-                <div class="card tech-card">
-                    <h2><i class="fas fa-code"></i> Tecnología</h2>
-                    <p>Este generador utiliza algoritmos de Python para crear contraseñas criptográficamente seguras.</p>
-                    <div class="tech-icons">
-                        <span class="tech-icon"><i class="fab fa-python"></i></span>
-                        <span class="tech-icon"><i class="fab fa-html5"></i></span>
-                        <span class="tech-icon"><i class="fab fa-css3-alt"></i></span>
-                        <span class="tech-icon"><i class="fab fa-js"></i></span>
-                        <span class="tech-icon"><i class="fab fa-flask"></i></span>
-                    </div>
-                </div>
+               
             </div>
         </main>
-
+        
         <footer>
-            <div class="footer-content">
-                <div class="copyright">
-                    <p>&copy; 2025 SecurePass</p>
-                </div>
-                <div class="social-links">
-                    <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                </div>
-            </div>
+            <p>&copy; 2025 PassGuard | Desarrollado con <i class="fas fa-heart"></i> por Nuestro Equipo</p>
         </footer>
     </div>
-
-    <!-- Notificación de copiado (aparece cuando se copia la contraseña) -->
+    
     <div id="toast" class="toast">
         <i class="fas fa-check-circle"></i>
         <span id="toast-message">Contraseña copiada al portapapeles</span>
     </div>
-
+    
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
