@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de Contraseñas Seguras</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <!-- Fuente de Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="Logo Generador de Contraseñas">
+                <h1>SecurePass</h1>
+            </div>
+        </header>
+
+        <main>
+            <div class="password-generator">
+                <h2>Generador de Contraseñas</h2>
+                <p class="description">Crea contraseñas seguras y únicas para tus cuentas</p>
+
+                <div class="password-display">
+                    <input type="text" id="password-result" readonly>
+                    <div class="actions">
+                        <button id="copy-password" title="Copiar Contraseña">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                        <button id="refresh-password" title="Generar Nueva Contraseña">
+                            <i class="fas fa-sync-alt"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="strength-meter">
+                    <div class="strength-label">Seguridad:</div>
+                    <div class="strength-bars">
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                        <span class="bar"></span>
+                    </div>
+                    <div class="strength-text">Fuerte</div>
+                </div>
+
+                <div class="options">
+                    <div class="option-group">
+                        <label for="password-length">Longitud:</label>
+                        <div class="length-control">
+                            <button id="decrease-length" class="length-btn">-</button>
+                            <input type="number" id="password-length" min="4" max="50" value="12">
+                            <button id="increase-length" class="length-btn">+</button>
+                        </div>
+                    </div>
+
+                    <div class="option-group">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="uppercase" checked>
+                            <label for="uppercase">Mayúsculas (A-Z)</label>
+                        </div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="lowercase" checked>
+                            <label for="lowercase">Minúsculas (a-z)</label>
+                        </div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="numbers" checked>
+                            <label for="numbers">Números (0-9)</label>
+                        </div>
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="special" checked>
+                            <label for="special">Símbolos (@#$%)</label>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="generate-password" class="generate-btn">Generar Contraseña</button>
+                
+                <div class="password-analysis" style="display: none;">
+                    <h3>Análisis de seguridad</h3>
+                    <div class="analysis-details">
+                        <div class="detail-item">
+                            <span class="detail-label">Tiempo para descifrar:</span>
+                            <span id="crack-time" class="detail-value">-</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Puntuación:</span>
+                            <span id="security-score" class="detail-value">-</span>
+                        </div>
+                        <div id="security-warnings" class="security-warnings">
+                            <!-- Se llenará con JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="password-tips">
+                <h3>Consejos para contraseñas seguras</h3>
+                <ul>
+                    <li><i class="fas fa-check"></i> Utiliza contraseñas de al menos 12 caracteres</li>
+                    <li><i class="fas fa-check"></i> Combina letras, números y símbolos</li>
+                    <li><i class="fas fa-check"></i> Evita información personal o palabras comunes</li>
+                    <li><i class="fas fa-check"></i> Usa contraseñas diferentes para cada cuenta</li>
+                    <li><i class="fas fa-check"></i> Cambia tus contraseñas regularmente</li>
+                </ul>
+                
+                <div class="api-info">
+                    <h4>API de Python</h4>
+                    <p>Esta aplicación utiliza un backend en Python para generar contraseñas criptográficamente seguras.</p>
+                    <a href="/api/docs" class="api-link">Ver documentación de la API</a>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>&copy; 2025 SecurePass - Generador de Contraseñas Seguras</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
