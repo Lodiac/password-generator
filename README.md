@@ -110,8 +110,6 @@ print(f"Contraseña generada: {password}")
 4. Sube los cambios (`git push origin feature/amazing-feature`)
 5. Abre un Pull Request
 
-Por favor, lee [CONTRIBUTING.md](CONTRIBUTING.md) para detalles sobre nuestro código de conducta y el proceso para enviarnos pull requests.
-
 ## 📄 Licencia
 
 Este proyecto está licenciado bajo la Licencia MIT - vea el archivo [LICENSE](LICENSE) para más detalles.
